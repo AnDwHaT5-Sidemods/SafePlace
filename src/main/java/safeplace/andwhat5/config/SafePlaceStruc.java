@@ -1,4 +1,4 @@
-package uk.co.haxyshideout.safeplace.config;
+package safeplace.andwhat5.config;
 
 import net.minecraft.util.math.Vec3d;
 

@@ -1,9 +1,10 @@
-package uk.co.haxyshideout.safeplace.config;
+package safeplace.andwhat5.config;
 
 import com.pixelmonmod.pixelmon.api.events.PixelmonStructureGenerationEvent;
 import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 
@@ -12,9 +13,10 @@ public class Utilities {
 	//Adds an automatically generated SafePlace based on pixelmons world gen event
 	public static void addSafePlace(PixelmonStructureGenerationEvent event)
 	{
-		double x = event.getStructureScattered().getBoundingBoxCenter().getX();
-		double y = event.getStructureScattered().getBoundingBoxCenter().getY();
-		double z = event.getStructureScattered().getBoundingBoxCenter().getZ();
+		System.out.println("IM BEING RUN");
+		double x = (event.getStructureScattered().getBoundingBox().maxX +  event.getStructureScattered().getBoundingBox().minX) / 2;
+		double y = (event.getStructureScattered().getBoundingBox().maxY +  event.getStructureScattered().getBoundingBox().minY) / 2;
+		double z = (event.getStructureScattered().getBoundingBox().maxZ +  event.getStructureScattered().getBoundingBox().minZ) / 2;
 		duplicationCheck((int)x,(int)z);
 		SafePlaceStruc sps = new SafePlaceStruc();
 		sps.Name = "G_Pokecenter("+(int)x+","+(int)y+","+(int)z+")";
@@ -69,8 +71,8 @@ public class Utilities {
 	{
 		for(SafePlaceStruc s : ConfigStruc.gcon.SafePlaces)
 		{
-			if((int)s.SafePlace.xCoord == x)
-				if((int)s.SafePlace.zCoord == z)
+			if((int)s.SafePlace.x == x)
+				if((int)s.SafePlace.z == z)
 				{
 					
 					ConfigStruc.gcon.SafePlaces.remove(s);
@@ -195,6 +197,54 @@ public class Utilities {
 		ConfigStruc.gcon.SafePlaces.remove(sps);
 		SafePlaceConfiguration.saveConfig();
 		CommandChatHandler.sendChat(player, TextFormatting.RED+"[SafePlace]"+ TextFormatting.BLUE+" Successfully deleted the SafePlace \""+sps.Name+"\"!", "");
+	}
+
+	public static SafePlaceStruc getNextNearestSafePlace(EntityPlayerMP player, SafePlaceStruc closestPlace,
+			boolean ignoreConfig) {
+		double distance = -1;
+		SafePlaceStruc safeplace = null;
+		if(SafePlaceConfiguration.requireEntryToSafeplace)
+		{
+			for(SafePlaceStruc s : ConfigStruc.gcon.SafePlaces)
+			{
+				if((distance == -1 && (ignoreConfig || getPlayerData(player).VisitedSafePlaces.contains(s.Name))
+						&& (player.getPositionVector().distanceTo(s.SafePlace) > player.getPositionVector().distanceTo(closestPlace.SafePlace))))
+				{
+					distance = player.getPositionVector().distanceTo(s.SafePlace);
+					safeplace = s;
+				} 
+				else 
+				if (player.getPositionVector().distanceTo(s.SafePlace) < distance && (ignoreConfig || getPlayerData(player).VisitedSafePlaces.contains(s.Name))
+						&& (player.getPositionVector().distanceTo(s.SafePlace) > player.getPositionVector().distanceTo(closestPlace.SafePlace)))
+				{
+					distance = player.getPositionVector().distanceTo(s.SafePlace);
+					safeplace = s;
+				}
+			}
+			return safeplace;
+		}
+		else
+		{
+			for(SafePlaceStruc s : ConfigStruc.gcon.SafePlaces)
+			{
+				if(distance == -1 && (player.getPositionVector().distanceTo(s.SafePlace) > player.getPositionVector().distanceTo(closestPlace.SafePlace)))
+				{
+					distance = player.getPositionVector().distanceTo(s.SafePlace);
+					safeplace = s;
+				}
+				else
+				{
+					if(player.getPositionVector().distanceTo(s.SafePlace) < distance
+							&& (player.getPositionVector().distanceTo(s.SafePlace) > player.getPositionVector().distanceTo(closestPlace.SafePlace)))
+					{
+						distance = player.getPositionVector().distanceTo(s.SafePlace);
+						safeplace = s;
+					}
+				}
+				return safeplace;
+			}
+		}
+		return null;
 	}
 	
 }

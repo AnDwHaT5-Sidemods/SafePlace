@@ -1,4 +1,4 @@
-package uk.co.haxyshideout.safeplace.commands;
+package safeplace.andwhat5.commands;
 
 import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 
@@ -8,18 +8,18 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import uk.co.haxyshideout.safeplace.SafePlace;
-import uk.co.haxyshideout.safeplace.config.Utilities;
+import safeplace.andwhat5.SafePlace;
+import safeplace.andwhat5.config.Utilities;
 
 public class SafePlaceCommand extends CommandBase {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "safeplace";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/safeplace delete:list:tp:add";
 	}
 	@Override
@@ -28,7 +28,7 @@ public class SafePlaceCommand extends CommandBase {
 		//Could hardly be bothered with this class. I will probably make it look prettier later on.
 		if(args.length == 0)
 		{
-			CommandChatHandler.sendChat(sender, getCommandUsage(sender), "");
+			CommandChatHandler.sendChat(sender, getUsage(sender), "");
 			return;
 		}
 		if(!(sender instanceof EntityPlayer))
@@ -50,7 +50,7 @@ public class SafePlaceCommand extends CommandBase {
 			if(args[0].equalsIgnoreCase("delete"))
 				Utilities.deleteSafePlace((EntityPlayer)sender);
 			else
-				CommandChatHandler.sendChat(sender, getCommandUsage(sender), "");
+				CommandChatHandler.sendChat(sender, getUsage(sender), "");
 		}
 		else
 		if(args.length == 3)
@@ -61,7 +61,7 @@ public class SafePlaceCommand extends CommandBase {
 			}
 		}
 		else
-			CommandChatHandler.sendChat(sender, getCommandUsage(sender), "");
+			CommandChatHandler.sendChat(sender, getUsage(sender), "");
 	}
 
 }

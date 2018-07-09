@@ -1,4 +1,4 @@
-package uk.co.haxyshideout.safeplace.config;
+package safeplace.andwhat5.config;
 
 import java.io.File;
 import java.io.FileReader;
@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import net.minecraftforge.common.config.Configuration;
-import uk.co.haxyshideout.safeplace.SafePlace;
+import safeplace.andwhat5.SafePlace;
 
 public class SafePlaceConfiguration {
 

@@ -1,4 +1,4 @@
-package uk.co.haxyshideout.safeplace;
+package safeplace.andwhat5;
 
 import com.pixelmonmod.pixelmon.Pixelmon;
 
@@ -7,9 +7,9 @@ import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import uk.co.haxyshideout.safeplace.commands.SafePlaceCommand;
-import uk.co.haxyshideout.safeplace.config.SafePlaceConfiguration;
-import uk.co.haxyshideout.safeplace.events.EventHandler;
+import safeplace.andwhat5.commands.SafePlaceCommand;
+import safeplace.andwhat5.config.SafePlaceConfiguration;
+import safeplace.andwhat5.events.EventHandler;
 
 @Mod(modid = SafePlace.MODID, version = SafePlace.VERSION, name = SafePlace.NAME, acceptableRemoteVersions = "*",  dependencies = "after:pixelmon")
 public class SafePlace {
