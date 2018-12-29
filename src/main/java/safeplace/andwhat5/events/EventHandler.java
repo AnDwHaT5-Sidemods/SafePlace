@@ -52,6 +52,7 @@ public class EventHandler {
 	        	teleportPlayerToNearestSafePlace(event.player);
 	        	PlayerStorage ps = PixelmonStorage.pokeBallManager.getPlayerStorage(event.player).get();
 	        	ps.healAllPokemon(event.player.world);
+	        	Utilities.removeMoney(event.player, ps.highestLevel);
 	        	Timer t = new Timer();
 	        	t.schedule(new TimerTask() {
 

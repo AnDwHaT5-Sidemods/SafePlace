@@ -1,12 +1,19 @@
 package safeplace.andwhat5.config;
 
+import com.pixelmonmod.pixelmon.Pixelmon;
+import com.pixelmonmod.pixelmon.api.economy.IPixelmonBankAccount;
 import com.pixelmonmod.pixelmon.api.events.PixelmonStructureGenerationEvent;
 import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 
+import com.pixelmonmod.pixelmon.storage.PixelmonStorage;
+import com.pixelmonmod.pixelmon.storage.PlayerStorage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
+
+import java.util.Optional;
 
 public class Utilities {
 
@@ -246,5 +253,24 @@ public class Utilities {
 		}
 		return null;
 	}
+
+	public static void removeMoney(EntityPlayerMP playerMP, int highestLevel){
+		if(SafePlaceConfiguration.loseMoneyOnBlackout) {
+			Pixelmon.moneyManager.getBankAccount(playerMP).ifPresent(e -> {
+				int moneyLost = SafePlaceConfiguration.moneyLostOnBlackout * highestLevel;
+				if(moneyLost <= e.getMoney()){
+					int money = e.getMoney() - moneyLost;
+					e.setMoney(money);
+					e.updatePlayer(money);
+					playerMP.sendMessage(new TextComponentString(TextFormatting.RED + "[SafePlace] " + TextFormatting.BLUE + "You have been charged " + SafePlaceConfiguration.moneyLostOnBlackout + " PokeDollars for blacking out. \n You now have " + e.getMoney() + " PokeDollars."));
+				}else{
+					e.setMoney(0);
+					e.updatePlayer(0);
+					playerMP.sendMessage(new TextComponentString(TextFormatting.RED + "[SafePlace] " + TextFormatting.BLUE + "You were charged " + SafePlaceConfiguration.moneyLostOnBlackout + " however, you cannot afford that. Your balance has been set to 0."));
+				}
+			});
+		}
+	}
+
 	
 }
