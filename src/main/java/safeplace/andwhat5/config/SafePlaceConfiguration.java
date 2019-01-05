@@ -20,10 +20,14 @@ public class SafePlaceConfiguration {
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 	public static boolean addNewCenters;
 	public static boolean requireEntryToSafeplace;
+	public static boolean loseMoneyOnBlackout;
+	public static int moneyLostOnBlackout;
 
 	public SafePlaceConfiguration() {
 		addNewCenters = config.get("main", "Should a SafePlace be generated when a Pokecenter is generated in the wild?", false).getBoolean();
 		requireEntryToSafeplace = config.get("main", "Should players be required to visit the SafePlace before teleporting there?", true).getBoolean();
+		loseMoneyOnBlackout = config.get("money", "Should players lose PokeDollars when they blackout?", true).getBoolean();
+		moneyLostOnBlackout = config.get("money", "Money Lost Multiplier (Formula: (Highest Lvl in Party) x (multiplier)", 5).getInt();
 		loadConfig();
 		
 		config.save();
