@@ -5,24 +5,21 @@ import java.util.NoSuchElementException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.events.PixelmonStructureGenerationEvent;
-import com.pixelmonmod.pixelmon.api.events.PlayerBattleEndedEvent;
+import com.pixelmonmod.pixelmon.api.events.battles.BattleEndEvent;
+import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipant;
+import com.pixelmonmod.pixelmon.battles.controller.participants.PlayerParticipant;
 import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
-import com.pixelmonmod.pixelmon.comm.EnumUpdateType;
-import com.pixelmonmod.pixelmon.storage.PixelmonStorage;
-import com.pixelmonmod.pixelmon.storage.PlayerNotLoadedException;
-import com.pixelmonmod.pixelmon.storage.PlayerStorage;
 
-import io.netty.util.concurrent.ScheduledFuture;
+import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
-import safeplace.andwhat5.SafePlace;
 import safeplace.andwhat5.config.ConfigStruc;
 import safeplace.andwhat5.config.PlayerStruc;
 import safeplace.andwhat5.config.SafePlaceConfiguration;
@@ -45,24 +42,34 @@ public class EventHandler {
 	}
 
 	@SubscribeEvent
-	public void onPlayerBattleEnd(PlayerBattleEndedEvent event) throws PlayerNotLoadedException
+	public void onPlayerBattleEnd(BattleEndEvent event)
 	{
+		for(BattleParticipant participant: event.results.keySet()){
+			if(participant instanceof PlayerParticipant){
+				if(((PlayerParticipant)participant).getNextPokemonUUID()==null){
+					teleportPlayerToNearestSafePlace(((PlayerParticipant) participant).player);
+					PlayerPartyStorage party=Pixelmon.storageManager.getParty(((PlayerParticipant) participant).player);
+					party.heal();
+					Utilities.removeMoney(((PlayerParticipant) participant).player, party.getHighestLevel());
+				}
+			}
+		}
 	    try {
-	        if (((PlayerStorage)PixelmonStorage.pokeBallManager.getPlayerStorage(event.player).get()).getFirstAblePokemon(event.player.getEntityWorld()) == null) {
-	        	teleportPlayerToNearestSafePlace(event.player);
-	        	PlayerStorage ps = PixelmonStorage.pokeBallManager.getPlayerStorage(event.player).get();
-	        	ps.healAllPokemon(event.player.world);
-	        	Utilities.removeMoney(event.player, ps.highestLevel);
-	        	Timer t = new Timer();
-	        	t.schedule(new TimerTask() {
+			for(BattleParticipant participant: event.results.keySet()){
+				if(participant instanceof PlayerParticipant){
+					if (((PlayerParticipant)participant).getNextPokemonUUID()==null) {
+						Timer t = new Timer();
+						t.schedule(new TimerTask() {
 
-					@Override
-					public void run() {
-						ps.sendUpdatedList();
-						
-					}}, 500);
-	        	
-	        }
+							@Override
+							public void run() {
+								Pixelmon.storageManager.getParty(((PlayerParticipant) participant).player).updatePartyCache();
+
+							}}, 500);
+
+					}
+				}
+			}
 	      }
 	      catch (NoSuchElementException nsee) {
 	        nsee.printStackTrace();
@@ -96,45 +103,6 @@ public class EventHandler {
             }
         }
     }
-	
-	/*@SubscribeEvent
-    public void onPlayerTicked(PlayerTickEvent e)
-    {
-        if(e.phase == Phase.END)
-        {
-            PlayerList p = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList();
-
-            for(EntityPlayerMP player: p.getPlayerList())
-            {
-                SafePlaceStruc sps = Utilities.getNearestSafePlace(player, true);
-                if(sps != null)
-                {
-                    if(sps.SafePlace.distanceTo(player.getPositionVector()) - sps.Radius < 0)
-                    {
-                        boolean found = false;
-                        PlayerStruc ps = Utilities.getPlayerData((EntityPlayer)player);
-                        for(String s : ps.VisitedSafePlaces)
-                        {
-                            if(sps.Name.equalsIgnoreCase(s))
-                            {
-                                found = true;
-                            }
-                        }
-                        if(!found)
-                        {
-                        	System.out.println("Player has NEVER visited before... adding the data.");
-                            ConfigStruc.gcon.PlayerData.remove(ps);
-                            ps.VisitedSafePlaces.add(sps.Name);
-                            ConfigStruc.gcon.PlayerData.add(ps);
-                            SafePlaceConfiguration.saveConfig();
-                            if(SafePlaceConfiguration.requireEntryToSafeplace)
-                                CommandChatHandler.sendChat(player, "You have successfully registered the "+sps.Name+" SafePlace!", "");
-                        }
-                    }
-                }
-            }
-        }
-    }*/
 	
 	public void teleportPlayerToNearestSafePlace(EntityPlayerMP player) {
 		SafePlaceStruc closestPlace = Utilities.getNearestSafePlace(player, false);

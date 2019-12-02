@@ -1,12 +1,9 @@
 package safeplace.andwhat5.config;
 
 import com.pixelmonmod.pixelmon.Pixelmon;
-import com.pixelmonmod.pixelmon.api.economy.IPixelmonBankAccount;
 import com.pixelmonmod.pixelmon.api.events.PixelmonStructureGenerationEvent;
 import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 
-import com.pixelmonmod.pixelmon.storage.PixelmonStorage;
-import com.pixelmonmod.pixelmon.storage.PlayerStorage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.Vec3d;
